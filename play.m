@@ -72,8 +72,6 @@ end
 
 
 
-
-
 % Find max and min and mean and absolute area in every neuron
 for n = 1:num_neurons
     
