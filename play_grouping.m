@@ -78,10 +78,10 @@ ylabel('Absolute Area', 'FontSize', 20)
 %----------------------------------%
 
 % Choose length of interval and step size
-i = 70;     step = i;
+i = 80;     step = i;
 
 % Choose neuron of interest
-k1 = 1;
+k1 = 98;
 str = join(['Neuron ', num2str(k1)]);
 
 % Initialize
@@ -115,14 +115,14 @@ end
 n = 1;  count = 1;
 
 % Moving average degree
-deg = 1;
+deg = 3;
 
 % Plot all chosen neurons with high correlation to k1
-for j = 1:10
+for j = 1:15
     figure(5)
     n_idx = group{j}(2);
     t = time_idx(count+1);
-    plot(time(n:t), movmean(dFoF(n_idx,n:t), deg), 'linewidth',1)
+    plot(time(n:t), movmean(dFoF(n_idx,n:t), deg), 'linewidth',2)
     hold on
     n = time_idx(count+1)+1;
     count = count + 1;
@@ -130,11 +130,11 @@ end
 
 % Plot k1
 figure(5);
-plot(time(1:t), movmean(dFoF(k1,1:t), deg), 'k', 'linewidth',1)
+plot(time(1:t), movmean(dFoF(k1,1:t), deg), 'k', 'linewidth',2)
 hold on
 
 % Plot Trial intervals
-for n = 1:4
+for n = 1:15
     figure(5)
     xline(time(salt_start_end{n}(1)), 'r', 'LineWidth',2)
     hold on
@@ -147,15 +147,11 @@ for n = 1:4
 end
 
 % Aesthetics
-%xlim([2500, 2800])
-xlim([0 350])
+%xlim([500, 800])
+xlim([0 500])
 set(gca, 'FontSize', 30)
 xlabel('Time', 'FontSize', 30)
 ylabel('DeltaF/F', 'FontSize', 30)
 title(str, 'FontSize', 30)
-
-
-
-
 
 
