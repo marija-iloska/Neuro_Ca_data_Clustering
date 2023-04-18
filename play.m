@@ -232,6 +232,12 @@ for n = 1:7
 end
 
 
+test = maxk(n_max, 10);
+for i = 1:10
+    test_idx(i) = find(n_max == test(i));
+end
+
+
 
 
 % ABSOLUTE AREA in TIME STEPS

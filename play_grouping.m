@@ -81,7 +81,7 @@ ylabel('Absolute Area', 'FontSize', 20)
 i = 80;     step = i;
 
 % Choose neuron of interest
-k1 = 98;
+k1 = 16;
 str = join(['Neuron ', num2str(k1)]);
 
 % Initialize
