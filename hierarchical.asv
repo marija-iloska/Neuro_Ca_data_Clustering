@@ -98,7 +98,7 @@ F2 = Fplot(group2, :);
 
 
 
-dist_mat = pdist2(F2, F2);
+dist_mat = pdist2(F1, F1);
 
 
 % Perform hierarchical clustering using complete linkage
@@ -111,18 +111,18 @@ idx = cluster(Z, 'Maxclust', k);
 figure(n)
 dendrogram(Z, 0);
 set(gca, 'FontSize', 20)
-title('Less Active', 'FontSize', 20)
+title('Most Active', 'FontSize', 20)
 
 
 figure(n+1)
 %clust = find(idx == 3);
-clust = [22, 4, 10];
+clust = [1, 5, 2];
 range = 2500:6500;
 for j = 1:length(clust)
-    plot(time(range), F2(clust(j),range), 'linewidth',1)
+    plot(time(range), F1(clust(j),range), 'linewidth',1)
     hold on
 end
-legend('22', '4', '10',  'FontSize', 30)
+legend('1', '5' ,'2',  'FontSize', 30)
 set(gca, 'FontSize', 20)
 
 
