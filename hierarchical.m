@@ -12,7 +12,7 @@ end
 
 % Sort area and get indices
 [area, idx_sorted] = sort(areaN, 'descend');
-%range = 1:3000;
+
 
 
 
@@ -37,7 +37,7 @@ range = 1:T;
 F = dFoF(idx_sorted(first), range);
 
 % Specify the number of clusters you want to obtain
-k = 2;
+k = 10;
 
 % Compute the distance matrix between the rows of F
 %dist_mat = pdist(F);
@@ -57,8 +57,7 @@ set(gca, 'FontSize', 15)
 
 % % Display the cluster assignments
 % disp(['Cluster assignments: ' num2str(idx')]);
-% 
-% 
+
 figure(n+1)
 Fplot = dFoF(idx_sorted, :);
 clust = find(idx == 3);
