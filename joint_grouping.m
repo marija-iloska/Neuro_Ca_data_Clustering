@@ -9,19 +9,28 @@ load trial_data.mat
 % SUGAR, SALT, INTER
 % Compute absolute area for each Neuron
 L = round(0.25*length(dFoF_sugar(1,:)));
-range1 = 2*L+1:3*L;
+range1 = 1:T;
 %range1 = 1500:3000;
 for n = 1:num_neurons
-    area_sugar(n) = trapz(abs(dFoF_sugar(n,range1)));
-    area_salt(n) =  trapz(abs(dFoF_salt(n,range1)));
-    area_inter(n) = trapz(abs(dFoF_inter(n,range1)));
-
+    area_sugar(n) = trapz(abs(dFoF_sugar(n,:)));
+    area_salt(n) =  trapz(abs(dFoF_salt(n,:)));
+    area_inter(n) = trapz(abs(dFoF_inter(n,:)));
+    area(n) = trapz(abs(dFoF(n, :)));
 end
 
 % Sort area and get indices
 [areaSU, idx_SU] = sort(area_sugar, 'descend');
 [areaSA, idx_SA] = sort(area_salt, 'descend');
 [areaIN, idx_IN] = sort(area_inter, 'descend');
+
+plot(area_sugar, 'linewidth',1)
+hold on
+plot(area_salt, 'linewidth',1)
+hold on
+plot(area_inter, 'linewidth',1)
+hold on
+plot(area, 'color', 'k', 'linewidth',1)
+legend('sugar', 'salt', 'inter', 'total')
 
 % GET TWO CLUSTERS
 dist_mat = pdist2(dFoF_salt, dFoF_salt);
