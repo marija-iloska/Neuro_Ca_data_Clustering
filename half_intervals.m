@@ -4,32 +4,36 @@ clc
 
 % Load data
 load Ca_data.mat
-load trial_data_first.mat
+%load trial_data_first.mat
 %load trial_data_second.mat
+load trial_data.mat
 
 % FIRST for all
-% SUGAR, SALT, INTER 
+% SUGAR, SALT, INTER
 %F = dFoF_first;
+%F = dFoF_second;
+F = {dFoF_sugar, dFoF_salt, dFoF_inter};
 M = length(F);
 % Compute absolute area for each Neuron
 for m = 1:M
     for n = 1:num_neurons
-        temp(n) = trapz(abs(F{m}(n,:))); 
+        temp(n) = trapz(abs(F{m}(n,:)));
     end
     area{m} = temp;
     [area_sort{m}, idx_sort{m}] = sort(temp, 'descend');
 end
 N = 113;
-k = 10;
+k = 4;
 
 % GET TWO CLUSTERS
 for m = 1 : M
     % Compute distance
     dist_mat = pdist2(F{m}(1:N,:), F{m}(1:N, :));
+    %dist_mat = pdist(F{m}(1:N,:));
 
     % Get linkage
     Z = linkage(dist_mat, 'average');
-    
+
     % Find cluster indices
     idx_cluster{m} = cluster(Z, 'Maxclust', k);
 
@@ -53,65 +57,53 @@ for m = 1 : M
     % Get rid of neurons
     rel_dFoF{m} = F{m}(relevant{m}, :);
 
+%     figure
+%     dendrogram(Z, 0)
+%     set(gca, 'FontSize', 15)
+%     title(intervals{m}, 'FontSize', 15)
+end
+
+
+k = 4;
+for m = 1:M
+    dF = rel_dFoF{m}(:,:);
+
+    % Compute distance
+    dist_mat = pdist2(dF, dF);
+
+    % Get linkage
+    Z = linkage(dist_mat, 'ward');
+
+    % figure
+    % dendrogram(Z, 0)
+    % set(gca, 'FontSize', 15)
+
+    % Find cluster indices and store them
+    idx_test = cluster(Z, 'maxclust', k);
+    for kk = 1:k
+        clusters{kk} = find(idx_test == kk);
+    end
+
+    % For each interval
+    clust_int{m} = clusters;
+
     figure
-    dendrogram(Z, 0)
-    set(gca, 'FontSize', 15)
-    title(intervals{m}, 'FontSize', 15)
+    mm = 1;
+    %mm = m;
+    clust = datasample(clust_int{mm}, 3);
+    dF = rel_dFoF{mm};
+    clust = clust{1};
+    range =1:1500;
+    for j = 1:length(clust)
+        plot(time(range), movmean(dF(clust(j),range),1), 'linewidth',2)
+        hold on
+    end
+    legend('1', '2', 'FontSize', 30)
+    title('Sugar, full interval', 'FontSize', 30)
+    set(gca, 'FontSize', 20)
+
+
 end
-
-
-
-
-F = rel_dFoF{1}(:,1:600);
-
-% Compute distance
-dist_mat = pdist2(F, F);
-
-% Get linkage
-Z = linkage(dist_mat, 'ward');
-
-figure
-dendrogram(Z, 0)
-set(gca, 'FontSize', 15)
-
-
-figure(n+1)
-%clust = find(idx == 3);
-clust = [13, 41, 5, 10, 25, 33 ];
-%clust = [4, 21, 35, 36, 37];
-clust = [11, 14, 15, 45];
-% clust = [12, 32, 31, 19];
-% clust = [24, 44, 26, 38]; %, 2, 26, 38];
-clust = [6, 39, 27];
-range = 1 : 500;
-for j = 1:length(clust)
-    plot(time(range), movmean(F(clust(j),range),1), 'linewidth',2)
-    hold on
-end
-%legend('22', '4', '10',  'FontSize', 30)
-set(gca, 'FontSize', 20)
-
-
-
-% VISUALIZE AREA
-% for m = 1:length(F)
-%     figure(1)
-%     plot(area{m}, 'linewidth',1)
-%     hold on
-% 
-%     figure(2)
-%     plot(area_sort{m}, 'linewidth',1)
-%     hold on
-% 
-% 
-% end
-% xline(length(neurons_big_group{1}), 'color', 'k', 'linewidth',1)
-% hold on
-% xline(length(neurons_big_group{2}), 'color', 'b', 'linewidth',1)
-% hold on
-% xline(length(neurons_big_group{3}), 'color', 'm', 'linewidth',1)
-% hold on
-% legend('sugar', 'salt', 'inter', 'FontSize', 15)
 
 
 
