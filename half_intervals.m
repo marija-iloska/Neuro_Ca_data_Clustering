@@ -16,6 +16,7 @@ F = {dFoF_sugar, dFoF_salt, dFoF_inter};
 M = length(F);
 % Compute absolute area for each Neuron
 for m = 1:M
+
     for n = 1:num_neurons
         temp(n) = trapz(abs(F{m}(n,:)));
     end
@@ -23,7 +24,9 @@ for m = 1:M
     [area_sort{m}, idx_sort{m}] = sort(temp, 'descend');
 end
 N = 113;
-k = 4;
+k = 3;
+
+
 
 % GET TWO CLUSTERS
 for m = 1 : M
@@ -57,16 +60,19 @@ for m = 1 : M
     % Get rid of neurons
     rel_dFoF{m} = F{m}(relevant{m}, :);
 
-%     figure
-%     dendrogram(Z, 0)
-%     set(gca, 'FontSize', 15)
-%     title(intervals{m}, 'FontSize', 15)
+    figure
+    dendrogram(Z, 0)
+    set(gca, 'FontSize', 15)
+    title(intervals{m}, 'FontSize', 15)
 end
 
 
-k = 4;
+
+
+
+num_k = [2, 5, 5];
 for m = 1:M
-    dF = rel_dFoF{m}(:,:);
+    dF = rel_dFoF{m};
 
     % Compute distance
     dist_mat = pdist2(dF, dF);
@@ -79,8 +85,8 @@ for m = 1:M
     % set(gca, 'FontSize', 15)
 
     % Find cluster indices and store them
-    idx_test = cluster(Z, 'maxclust', k);
-    for kk = 1:k
+    idx_test = cluster(Z, 'maxclust', num_k(m));
+    for kk = 1:num_k(m)
         clusters{kk} = find(idx_test == kk);
     end
 
@@ -88,20 +94,26 @@ for m = 1:M
     clust_int{m} = clusters;
 
     figure
-    mm = 1;
-    %mm = m;
+    %mm = 2;
+    mm = 3;
     clust = datasample(clust_int{mm}, 3);
     dF = rel_dFoF{mm};
     clust = clust{1};
-    range =1:1500;
+    % Tracking indices
+    indices = relevant{m}(clust);
+    range = 1:1800;
     for j = 1:length(clust)
-        plot(time(range), movmean(dF(clust(j),range),1), 'linewidth',2)
+        plot(time(range), movmean(dF(clust(j),range),1), 'linewidth',2);
         hold on
     end
-    legend('1', '2', 'FontSize', 30)
-    title('Sugar, full interval', 'FontSize', 30)
+    plot(time(range), mean(dF(clust, range), 1), 'k', 'linewidth', 2);
+    title(intervals{mm}, 'FontSize', 30)
+    str = [string(indices), 'mean'];
+    legend(str , 'FontSize', 15)
     set(gca, 'FontSize', 20)
 
+    filename = join(['figs/', intervals{mm}, '.eps']);
+    print(gcf, filename, '-depsc2', '-r300');
 
 end
 
