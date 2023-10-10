@@ -49,7 +49,8 @@ end
 
 
 % Save CA data
-save("Ca_data.mat", 'dt', 'T', 'time', 'time_f', 'dFoF', 'salt_start_end', 'salt_start_end', 'num_neurons')
+save("Ca_data.mat", 'dt', 'T', 'time', 'time_f', 'dFoF', ...
+    'sugar_start_end', 'salt_start_end', 'num_neurons', 'num_sugar_trials', 'num_salt_trials')
 
 
 

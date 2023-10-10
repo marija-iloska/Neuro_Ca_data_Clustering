@@ -23,7 +23,7 @@ trial_frames = {sugar_start_end, salt_start_end};
 min_F = min(min(dFoF));
 w_norm = sum(dFoF - min_F, 2);
 dFoF_norm = (dFoF -min_F)./w_norm;
-dFoF_norm = dFoF_norm/(max(max(dFoF_norm)));
+dFoF_norm = (dFoF_norm'./max(dFoF_norm'))';
 
 
 % JOIN all "taste" trials
@@ -34,9 +34,7 @@ for i = 1 : num_tastes
     range = [];
     first = [];
     second = [];
-    psth_entire = [];
-    psth_first  = [];
-    psth_second = [];
+    clear psth_entire psth_first psth_second 
 
     % Collect every trial index range - ENTIRE trial range
     for n = 1: num_trials(i)   
@@ -53,9 +51,9 @@ for i = 1 : num_tastes
         second = [second second_temp];
         
         % PSTH
-        psth_entire = [psth_entire;   dFoF_norm(:,temp)];
-        psth_first  = [psth_first;    dFoF_norm(:,first_temp)];
-        psth_second = [psth_second;   dFoF_norm(:,second_temp)];
+        psth_entire(n, 1:num_neurons,:) =  dFoF_norm(:,temp);
+        psth_first(n,  1:num_neurons,:)  = dFoF_norm(:,first_temp);
+        psth_second(n, 1:num_neurons,:) =  dFoF_norm(:,second_temp);
     end
 
     % Get JOINT dFoF ranges
@@ -96,6 +94,6 @@ dFoF_salt = {dFoF_entire_salt, dFoF_first_salt, dFoF_second_salt};
 
 % Save file
 save('trial_data.mat', 'dFoF_sugar', 'dFoF_salt', 'frames', 'split', ...
-    'dFoF_norm', 'psth_decis', 'psth_taste', 'psth_trial')
+    'dFoF_norm', 'psth_decis', 'psth_taste', 'psth_trial', 'intervals')
 
 

@@ -4,27 +4,21 @@ clc
 
 % Load data
 load Ca_data.mat
-load neuron_PSTHs.mat
-%load trial_data_first.mat
-%load trial_data_second.mat
-% load trial_data.mat
+load trial_data.mat
 
-% FIRST for all
-% SUGAR, SALT, INTER
-%F = dFoF_first;
-%F = dFoF_second;
-% F = {dFoF_sugar, dFoF_salt, dFoF_inter};
-N = 113;
-k = 3;
+% For my PSTHs a good clustering linkage is 'ward'
+% PSTHs concatenate as [sugar, salt, left, right]
+F = {psth_taste{1}, psth_taste{2}, psth_decis{1}, psth_decis{2}};
+neurons = [psth_taste{1}, psth_taste{2}, psth_decis{1}, psth_decis{2}];
+%load neuron_PSTHs.mat
+
+% Relevant Sections
 intervals = {'Sucrose', 'Salt', 'Left', 'Right'};
+M = length(intervals);
 
-dFoF_salt = neurons(1:N, 1:50);
-dFoF_sugar = neurons(1:N, 51:100);
-dFoF_left = neurons(1:N, 101:150);
-dFoF_right= neurons(1:N, 151:200);
-F = {dFoF_sugar, dFoF_salt, dFoF_left, dFoF_right};
 
-M = length(F);
+%% ABSOULTE AREA
+
 % Compute absolute area for each Neuron
 for m = 1:M
 
@@ -37,95 +31,88 @@ end
 
 
 
+%% GET RID OF LOUD MAJORITY
+% Linkage
+link = 'ward';
 
-% GET TWO CLUSTERS
-for m = 1 : M
-    % Compute distance
-    dist_mat = pdist2(F{m}(1:N,:), F{m}(1:N, :));
-    %dist_mat = pdist(F{m}(1:N,:));
+% Number of clusters
+k = 3;
 
-    % Get linkage
-    Z = linkage(dist_mat, 'average');
+% Overall clustering and overlap with area
+[Z, overlap, rest] = clustering(F, num_neurons, M, k, link, idx_sort);
 
-    % Find cluster indices
-    idx_cluster{m} = cluster(Z, 'Maxclust', k);
+% Visualize
+% figure
+% m = 1;
+% dendrogram(Z{m}, 0)
+% set(gca, 'FontSize', 15)
+% title(intervals{m}, 'FontSize', 15)
 
-    % Find cluster size and index of cluster size
-    cluster_sz = [];
-    for kk = 1:k
-        cluster_sz = [cluster_sz, sum(idx_cluster{m} == kk)];
-    end
-    idx_big_group(m) = find(cluster_sz == max(cluster_sz));
-    %idx_small_group(m) = find(cluster_sz == min( setdiff(cluster_sz, min(cluster_sz))));
 
-    % Get the entire groups of neurons
-    neurons_big_group{m} = find(idx_cluster{m} == idx_big_group(m));
-    %neurons_small_group{m} = find(idx_cluster{m} == idx_small_group(m));
 
-    % Get intersections
-    %overlap{m} = intersect(neurons_small_group{m}, idx_sort{m}(1:length(neurons_small_group{m})));
-    overlap{m} = intersect(neurons_big_group{m}, idx_sort{m}(end -length(neurons_big_group{m}) : end));
-    relevant{m} = setdiff(1:N, overlap{m});
+%% CLUSTERING ON SMALL GROUP
 
-    % Get rid of neurons
-    rel_dFoF{m} = F{m}(relevant{m}, :);
+% Original indices would be overlap{m}(clusters{k1, k2, ..})
 
-    figure
-    dendrogram(Z, 0)
-    set(gca, 'FontSize', 15)
-    title(intervals{m}, 'FontSize', 15)
+% Number of clusters to break in
+num_k = 20;
+
+% Choose index [sugar, salt, left, right]
+m = 4;
+
+% Only Interval data here
+dF = neurons(:, 136:180);
+%dF = F{m}(overlap{m}, :);
+
+% Compute distance
+dist_mat = pdist2(dF, dF);
+
+% Get linkage
+Z = linkage(dist_mat, 'ward');
+
+% figure
+% dendrogram(Z, 0)
+% set(gca, 'FontSize', 15)
+
+% Find cluster indices and store them
+idx_test = cluster(Z, 'maxclust', num_k);
+for kk = 1:num_k
+    clusters{kk} = find(idx_test == kk);
 end
 
 
+%% SAMPLE A CLUSTER AND PLOT
 
+figure;
+for kk = 1:num_k
+    % Sample one of the clusters
+    %clust = datasample(clusters, 1);
+    % Extract the indices in the cluster
+    %clust = clust{1};
 
+    clust = clusters{kk};
 
-num_k = [2, 5, 5];
-for m = 1:M
-    dF = rel_dFoF{m};
-
-    % Compute distance
-    dist_mat = pdist2(dF, dF);
-
-    % Get linkage
-    Z = linkage(dist_mat, 'ward');
-
-    % figure
-    % dendrogram(Z, 0)
-    % set(gca, 'FontSize', 15)
-
-    % Find cluster indices and store them
-    idx_test = cluster(Z, 'maxclust', num_k(m));
-    for kk = 1:num_k(m)
-        clusters{kk} = find(idx_test == kk);
-    end
-
-    % For each interval
-    clust_int{m} = clusters;
-
-    figure
-    mm = m;
-    %mm = 3;
-    clust = datasample(clust_int{mm}, 3);
-    dF = rel_dFoF{mm};
-    clust = clust{1};
     % Tracking indices
-    indices = relevant{m}(clust);
-    range = 1:1800;
+    %indices = overlap{m}(clust)';
+    indices = clust';
+
+
+    subplot(4, 5, kk)
     for j = 1:length(clust)
-        plot(time(range), movmean(dF(clust(j),range),1), 'linewidth',2);
+        plot(neurons(indices(j),:), 'linewidth',2);
         hold on
     end
-    plot(time(range), mean(dF(clust, range), 1), 'k', 'linewidth', 2);
-    title(intervals{mm}, 'FontSize', 30)
+    plot(mean(neurons(indices, :), 1), 'k', 'linewidth', 2);
+    title(intervals{m}, 'FontSize', 30)
     str = [string(indices), 'mean'];
     legend(str , 'FontSize', 15)
     set(gca, 'FontSize', 20)
 
-    filename = join(['figs/', intervals{mm}, '.eps']);
-    print(gcf, filename, '-depsc2', '-r300');
 
 end
+% filename = join(['figs/', intervals{mm}, '.eps']);
+% print(gcf, filename, '-depsc2', '-r300');
+
 
 
 
