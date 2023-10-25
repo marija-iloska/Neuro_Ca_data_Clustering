@@ -3,12 +3,19 @@ close all
 clc
 
 % Choose which data to load
-choice = {'neurons_aligned_FL', 'neurons_aligned_FC', 'neurons_aligned_valve'};
-idx = 2;
+%choice = {'neurons_aligned_FL', 'neurons_aligned_FC', 'neurons_aligned_valve'};
+session = {'s202', 's301', 's302', 's313', 'sf203', 'sf309', 'sf311'};
+
+idx = 1;
+
+str_ses = session{idx};
 
 % Load and convert data
-neuron_data = struct2cell(load(choice{idx}));
-neuron_data = neuron_data{:};
+dat = load(join( ['Raw_Data/', str_ses, '.mat']));
+dat = struct2cell(dat(:));
+dat = dat{:};
+neuron_data = dat.neurons;
+clear dat
 
 
 % Number of Neurons
@@ -48,9 +55,11 @@ for n = 1:num_sugar_trials
 end
 
 
+filename = join(['Ca_Data/Ca_', session{idx}, '.mat']);
+
 % Save CA data
-save("Ca_data.mat", 'dt', 'T', 'time', 'time_f', 'dFoF', ...
-    'sugar_start_end', 'salt_start_end', 'num_neurons', 'num_sugar_trials', 'num_salt_trials')
+save(filename, 'dt', 'T', 'time', 'time_f', 'dFoF', ...
+    'sugar_start_end', 'salt_start_end', 'num_neurons', 'num_sugar_trials', 'num_salt_trials', 'str_ses')
 
 
 

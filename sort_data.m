@@ -3,7 +3,7 @@ close all
 clc
 
 % Load data
-load Ca_data.mat
+load Ca_Data/Ca_sf311.mat
 
 % Tastes in experiments
 intervals = {'sugar', 'salt'};
@@ -93,7 +93,8 @@ dFoF_sugar = {dFoF_entire_sugar, dFoF_first_sugar, dFoF_second_sugar};
 dFoF_salt = {dFoF_entire_salt, dFoF_first_salt, dFoF_second_salt};
 
 % Save file
-save('trial_data.mat', 'dFoF_sugar', 'dFoF_salt', 'frames', 'split', ...
+filename = join(['Sort_Data/trial_', str_ses, '.mat']);
+save(filename, 'dFoF_sugar', 'dFoF_salt', 'frames', 'split', ...
     'dFoF_norm', 'psth_decis', 'psth_taste', 'psth_trial', 'intervals')
 
 

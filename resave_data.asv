@@ -1,0 +1,14 @@
+clear all
+close all
+clc
+
+
+% Choose which data to load
+s202 = summaryImagingData(1);
+s301 = ummaryImagingData(2);
+s302 = ummaryImagingData(3);
+s313 = ummaryImagingData(4);
+
+
+save('Data/s301.mat', "s301")
+

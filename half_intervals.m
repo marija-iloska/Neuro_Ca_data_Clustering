@@ -2,9 +2,16 @@ clear all
 close all
 clc
 
+% Choose session
+session = {'s202', 's301', 's302', 's313', 'sf203', 'sf309', 'sf311'};
+
+idx = 2;
+ca_str = join(['Ca_Data/Ca_', session{idx}, '.mat']);
+tr_str = join(['Sort_Data/trial_', session{idx}, '.mat']);
+
 % Load data
-load Ca_data.mat
-load trial_data.mat
+load(ca_str)
+load(tr_str)
 
 % For my PSTHs a good clustering linkage is 'ward'
 % PSTHs concatenate as [sugar, salt, left, right]
