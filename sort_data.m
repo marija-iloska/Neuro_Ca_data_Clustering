@@ -6,7 +6,7 @@ clc
 % Choose session
 session = {'s202', 's301', 's302', 's313', 'sf203', 'sf309', 'sf311'};
 
-idx = 2;
+idx = 7;
 ca_str = join(['Ca_Data/Ca_', session{idx}, '.mat']);
 
 % Load data

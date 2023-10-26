@@ -3,7 +3,7 @@ function [Z_store, overlap, rest] = clustering(F, N, M, k, link, idx_sort)
 % GET TWO CLUSTERS
 for m = 1 : M
     % Compute distance
-    dist_mat = pdist2(F{m}(1:N,:), F{m}(1:N, :));
+    dist_mat = pdist2(F, F(1:N, :));
     %dist_mat = pdist(F{m}(1:num_neurons,:));
 
     % Get linkage
