@@ -40,7 +40,7 @@ end
 
 %% GET RID OF LOUD MAJORITY
 % Linkage
-link = 'ward';
+link = 'average';
 
 % Number of clusters
 k = 3;

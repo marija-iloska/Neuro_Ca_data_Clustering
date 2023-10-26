@@ -30,9 +30,9 @@ trial_frames = {sugar_start_end, salt_start_end};
 min_F = min(min(dFoF));
 w_norm = sum(dFoF - min_F, 2);
 %dFoF_norm = (dFoF -min_F)./w_norm;
-dFoF_norm = (dFoF - min_F);
-dFoF_norm = dFoF_norm./(max(dFoF_norm));
-% dFoF_norm = dFoF;
+% dFoF_norm = (dFoF - min_F);
+% dFoF_norm = dFoF_norm./(max(dFoF_norm));
+dFoF_norm = dFoF;
 
 
 % JOIN all "taste" trials
@@ -60,27 +60,21 @@ for i = 1 : num_tastes
         second = [second second_temp];
         
         % PSTH
-        psth_entire(n,1:num_neurons,:) = dFoF_norm(:,temp); % - mean(dFoF_norm(:,temp(1:10)),2);
-        psth_first(n, 1:num_neurons,:)  = dFoF_norm(:,first_temp); % - mean(dFoF_norm(:,temp(1:10)),2);
-        psth_second(n,1:num_neurons,:) =  dFoF_norm(:,second_temp); % - mean(dFoF_norm(:, second_temp(1:10)),2);
+        psth_entire(n,1:num_neurons,:) = dFoF_norm(:,temp)- mean(dFoF_norm(:,temp(1:10)),2);
+        psth_first(n, 1:num_neurons,:)  = dFoF_norm(:,first_temp)- mean(dFoF_norm(:,temp(1:10)),2);
+        psth_second(n,1:num_neurons,:) =  dFoF_norm(:,second_temp) - mean(dFoF_norm(:, second_temp(1:10)),2);
     end
 
     % Get JOINT dFoF ranges
     entire_trial{i} = range;
     first_half{i} = first;
     second_half{i} = second;
-
-%     min_all = min(min(min(psth_entire)));
-%     psth_entire = psth_entire - min_all;
-    max_all = max(max(max(psth_entire)));
-    max_all = 1;
-
    
 
     % PSTH
-    psth_trial{i} = squeeze(mean( (psth_entire)/max_all, 1));
-    psth_taste{i} = squeeze(mean( (psth_first)/max_all, 1));
-    psth_decis{i} = squeeze(mean( (psth_second)/max_all, 1));
+    psth_trial{i} = squeeze(mean( psth_entire, 1));
+    psth_taste{i} = squeeze(mean( psth_first, 1));
+    psth_decis{i} = squeeze(mean( psth_second, 1));
 
 
     % Name and get values using indices
@@ -94,6 +88,21 @@ for i = 1 : num_tastes
     assignin('base',str, dFoF(:, second_half{i}));
 
 end
+
+for i = 1:num_tastes
+    for n = 1:num_neurons
+        psth_taste{i}(n,:) = psth_taste{i}(n,:) - min(psth_taste{i}(n,:));
+        psth_taste{i}(n,:) = psth_taste{i}(n,:)/max(psth_taste{i}(n,:));
+
+        psth_trial{i}(n,:) = psth_trial{i}(n,:) - min(psth_trial{i}(n,:));
+        psth_trial{i}(n,:) = psth_trial{i}(n,:)/max(psth_trial{i}(n,:));
+
+        psth_decis{i}(n,:) = psth_decis{i}(n,:) - min(psth_decis{i}(n,:));
+        psth_decis{i}(n,:) = psth_decis{i}(n,:)/max(psth_decis{i}(n,:));
+    end
+end
+
+
 
 
 % Get joint inter trial frames
