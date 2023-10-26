@@ -2,8 +2,15 @@ clear all
 close all
 clc
 
+
+% Choose session
+session = {'s202', 's301', 's302', 's313', 'sf203', 'sf309', 'sf311'};
+
+idx = 2;
+ca_str = join(['Ca_Data/Ca_', session{idx}, '.mat']);
+
 % Load data
-load Ca_Data/Ca_sf311.mat
+load(ca_str)
 
 % Tastes in experiments
 intervals = {'sugar', 'salt'};
@@ -22,8 +29,10 @@ trial_frames = {sugar_start_end, salt_start_end};
 % Normalizing sum
 min_F = min(min(dFoF));
 w_norm = sum(dFoF - min_F, 2);
-dFoF_norm = (dFoF -min_F)./w_norm;
-dFoF_norm = (dFoF_norm'./max(dFoF_norm'))';
+%dFoF_norm = (dFoF -min_F)./w_norm;
+dFoF_norm = (dFoF - min_F);
+dFoF_norm = dFoF_norm./(max(dFoF_norm));
+% dFoF_norm = dFoF;
 
 
 % JOIN all "taste" trials
@@ -51,9 +60,9 @@ for i = 1 : num_tastes
         second = [second second_temp];
         
         % PSTH
-        psth_entire(n, 1:num_neurons,:) =  dFoF_norm(:,temp);
-        psth_first(n,  1:num_neurons,:)  = dFoF_norm(:,first_temp);
-        psth_second(n, 1:num_neurons,:) =  dFoF_norm(:,second_temp);
+        psth_entire(n,1:num_neurons,:) = dFoF_norm(:,temp); % - mean(dFoF_norm(:,temp(1:10)),2);
+        psth_first(n, 1:num_neurons,:)  = dFoF_norm(:,first_temp); % - mean(dFoF_norm(:,temp(1:10)),2);
+        psth_second(n,1:num_neurons,:) =  dFoF_norm(:,second_temp); % - mean(dFoF_norm(:, second_temp(1:10)),2);
     end
 
     % Get JOINT dFoF ranges
@@ -61,10 +70,17 @@ for i = 1 : num_tastes
     first_half{i} = first;
     second_half{i} = second;
 
+%     min_all = min(min(min(psth_entire)));
+%     psth_entire = psth_entire - min_all;
+    max_all = max(max(max(psth_entire)));
+    max_all = 1;
+
+   
+
     % PSTH
-    psth_trial{i} = squeeze(mean(psth_entire, 1));
-    psth_taste{i} = squeeze(mean(psth_first, 1));
-    psth_decis{i} = squeeze(mean(psth_second, 1));
+    psth_trial{i} = squeeze(mean( (psth_entire)/max_all, 1));
+    psth_taste{i} = squeeze(mean( (psth_first)/max_all, 1));
+    psth_decis{i} = squeeze(mean( (psth_second)/max_all, 1));
 
 
     % Name and get values using indices
@@ -95,6 +111,6 @@ dFoF_salt = {dFoF_entire_salt, dFoF_first_salt, dFoF_second_salt};
 % Save file
 filename = join(['Sort_Data/trial_', str_ses, '.mat']);
 save(filename, 'dFoF_sugar', 'dFoF_salt', 'frames', 'split', ...
-    'dFoF_norm', 'psth_decis', 'psth_taste', 'psth_trial', 'intervals')
+    'dFoF', 'psth_decis', 'psth_taste', 'psth_trial', 'intervals')
 
 

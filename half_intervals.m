@@ -15,6 +15,7 @@ load(tr_str)
 
 % For my PSTHs a good clustering linkage is 'ward'
 % PSTHs concatenate as [sugar, salt, left, right]
+
 F = {psth_taste{1}, psth_taste{2}, psth_decis{1}, psth_decis{2}};
 neurons = [psth_taste{1}, psth_taste{2}, psth_decis{1}, psth_decis{2}];
 %load neuron_PSTHs.mat
@@ -28,7 +29,6 @@ M = length(intervals);
 
 % Compute absolute area for each Neuron
 for m = 1:M
-
     for n = 1:num_neurons
         temp(n) = trapz(abs(F{m}(n,:)));
     end
@@ -49,11 +49,11 @@ k = 3;
 [Z, overlap, rest] = clustering(F, num_neurons, M, k, link, idx_sort);
 
 % Visualize
-% figure
-% m = 1;
-% dendrogram(Z{m}, 0)
-% set(gca, 'FontSize', 15)
-% title(intervals{m}, 'FontSize', 15)
+figure
+m = 3;
+dendrogram(Z{m}, 0)
+set(gca, 'FontSize', 15)
+title(intervals{m}, 'FontSize', 15)
 
 
 
@@ -68,14 +68,14 @@ num_k = 20;
 m = 4;
 
 % Only Interval data here
-dF = neurons(:, 136:180);
-%dF = F{m}(overlap{m}, :);
+%dF = neurons(:, 136:180);
+dF = F{m}(overlap{m}, :);
 
 % Compute distance
 dist_mat = pdist2(dF, dF);
 
 % Get linkage
-Z = linkage(dist_mat, 'ward');
+Z = linkage(dist_mat, 'average');
 
 % figure
 % dendrogram(Z, 0)
@@ -110,7 +110,7 @@ for kk = 1:num_k
         hold on
     end
     plot(mean(neurons(indices, :), 1), 'k', 'linewidth', 2);
-    title(intervals{m}, 'FontSize', 30)
+    %title(intervals{m}, 'FontSize', 30)
     str = [string(indices), 'mean'];
     legend(str , 'FontSize', 15)
     set(gca, 'FontSize', 20)
