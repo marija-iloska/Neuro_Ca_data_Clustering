@@ -5,13 +5,14 @@ clc
 % Choose session
 session = {'s202', 's301', 's302', 's313', 'sf203', 'sf309', 'sf311'};
 
-idx = 7;
+idx = 3;
 ca_str = join(['Ca_Data/Ca_', session{idx}, '.mat']);
 tr_str = join(['Sort_Data/trial_', session{idx}, '.mat']);
 
 % Load data
 load(ca_str)
 load(tr_str)
+load neuronImportance.mat
 
 % For my PSTHs a good clustering linkage is 'ward'
 % PSTHs concatenate as [sugar, salt, left, right]
@@ -19,6 +20,8 @@ load(tr_str)
 F = {psth_taste{1}, psth_taste{2}, psth_decis{1}, psth_decis{2}};
 neurons = [psth_taste{1}, psth_taste{2}, psth_decis{1}, psth_decis{2}];
 %load neuron_PSTHs.mat
+%neurons = [psth_test{1}(:,1:45), psth_test{2}(:,1:45),psth_test{1}(:,46:90), psth_test{2}(:,46:90) ];
+neurons = [taste, decis];
 
 % Relevant Sections
 intervals = {'Sucrose', 'Salt', 'Left', 'Right'};
@@ -88,8 +91,8 @@ for kk = 1:num_k
 end
 
 
-% SAMPLE A CLUSTER AND PLOT
-
+%% SAMPLE A CLUSTER AND PLOT
+start = 8000;
 
 for kk = 1:num_k
     % Sample one of the clusters
@@ -102,18 +105,21 @@ for kk = 1:num_k
     % Tracking indices
     %indices = overlap{m}(clust)';
     indices = clust';
+    range = start:start+ 1000;
+% 
+    figure(1)
+    subplot(5, 5, kk)
+    for j = 1:length(clust)
+        plot(range, dFoF(indices(j),range), 'linewidth',1);
+        hold on
+    end
+    %plot(mean(neurons(indices, :), 1), 'k', 'linewidth', 2);
+    %title(intervals{m}, 'FontSize', 30)
+    str = [string(indices), 'mean'];
+    %legend(str , 'FontSize', 15)
+    set(gca, 'FontSize', 20)
+    pbaspect([2 1 1])
 
-%     figure(1)
-%     subplot(4, 3, kk)
-%     for j = 1:length(clust)
-%         plot(neurons(indices(j),:), 'linewidth',2);
-%         hold on
-%     end
-%     plot(mean(neurons(indices, :), 1), 'k', 'linewidth', 2);
-%     %title(intervals{m}, 'FontSize', 30)
-%     str = [string(indices), 'mean'];
-%     %legend(str , 'FontSize', 15)
-%     set(gca, 'FontSize', 20)
 
 
     figure(2)
@@ -131,17 +137,26 @@ for kk = 1:num_k
     
     set(gca, 'FontSize', 15)
 
+      if(sum(ismember([72, 222, 179, 218, 202, 150], indices))>0)
+          kk
+      end
+
 
 end
-legend('Sucrose', 'Salt', 'Left', 'Right', 'FontSIze', 20)
-sgtitle(str_ses, 'FontSize', 20)
+set(gcf, 'PaperSize', [10 5]);
+%legend('Sucrose', 'Salt', 'Left', 'Right', 'FontSIze', 20)
+%sgtitle(str_ses, 'FontSize', 20)
 
 
-%% Save plot
-filename = join(['figs/', str_ses, '.eps']);
-print(gcf, filename, '-depsc2', '-r300');
+% %% Save plot
+% filename = join(['figs/', str_ses, '.eps']);
+% print(gcf, filename, '-depsc2', '-r300');
 
 
+% DELTA F o F plot
+% filename = join(['figs/F', str_ses, '.eps']);
+% print(gcf, filename, '-depsc2', '-r300');
+% 
 
 
 

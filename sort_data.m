@@ -6,7 +6,7 @@ clc
 % Choose session
 session = {'s202', 's301', 's302', 's313', 'sf203', 'sf309', 'sf311'};
 
-idx = 7;
+idx = 6;
 ca_str = join(['Ca_Data/Ca_', session{idx}, '.mat']);
 
 % Load data
@@ -76,6 +76,8 @@ for i = 1 : num_tastes
     psth_taste{i} = squeeze(mean( psth_first, 1));
     psth_decis{i} = squeeze(mean( psth_second, 1));
 
+    psth_test{i} = [psth_taste{i}, psth_decis{i}];
+
 
     % Name and get values using indices
     str = join(['dFoF_entire', '_', intervals{i}]);
@@ -89,6 +91,18 @@ for i = 1 : num_tastes
 
 end
 
+for n = 1:num_neurons
+
+    taste(n,:) = [psth_taste{1}(n,:), psth_taste{2}(n,:)];
+    taste(n,:) = taste(n,:) - min(taste(n,:));
+    taste(n,:) = taste(n,:)/max(taste(n,:));
+
+    decis(n,:) = [psth_decis{1}(n,:), psth_decis{2}(n,:)];
+    decis(n,:) = decis(n,:) - min(decis(n,:));
+    decis(n,:) = decis(n,:)/max(decis(n,:));
+
+end
+
 for i = 1:num_tastes
     for n = 1:num_neurons
         psth_taste{i}(n,:) = psth_taste{i}(n,:) - min(psth_taste{i}(n,:));
@@ -99,8 +113,14 @@ for i = 1:num_tastes
 
         psth_decis{i}(n,:) = psth_decis{i}(n,:) - min(psth_decis{i}(n,:));
         psth_decis{i}(n,:) = psth_decis{i}(n,:)/max(psth_decis{i}(n,:));
+
+        psth_test{i}(n,:) = psth_test{i}(n,:) - min(psth_test{i}(n,:));
+        psth_test{i}(n,:) = psth_test{i}(n,:)/max(psth_test{i}(n,:));
+
     end
 end
+
+
 
 
 
@@ -120,6 +140,6 @@ dFoF_salt = {dFoF_entire_salt, dFoF_first_salt, dFoF_second_salt};
 % Save file
 filename = join(['Sort_Data/trial_', str_ses, '.mat']);
 save(filename, 'dFoF_sugar', 'dFoF_salt', 'frames', 'split', ...
-    'dFoF', 'psth_decis', 'psth_taste', 'psth_trial', 'intervals')
+    'dFoF', 'psth_decis', 'psth_taste', 'psth_trial', 'intervals', 'taste', 'decis')
 
 
